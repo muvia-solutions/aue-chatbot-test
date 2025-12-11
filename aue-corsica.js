@@ -1,22 +1,17 @@
 (function() {
-    // Fonction principale qui lance tout
+    // Fonction principale
     function initBotpress() {
-        console.log("🚀 Lancement du script Botpress MUVIA...");
-
+        
         // --- 🔒 SÉCURITÉ : ALLOW ORIGIN ---
         const currentDomain = window.location.hostname;
         const allowedDomains = ["www.aue.corsica", "aue.corsica"];
 
-        // On affiche le domaine détecté pour le débug
-        console.log("Domaine détecté :", currentDomain);
-
-        // Vérification (Si le domaine n'est pas dans la liste, on arrête)
+        // Si le domaine n'est pas dans la liste, on arrête tout.
         if (!allowedDomains.includes(currentDomain)) {
             console.warn("⛔ MUVIA Chatbot : Licence non valide pour ce domaine (" + currentDomain + ").");
-            // return; // <-- DÉCOMMENTE CETTE LIGNE UNE FOIS QUE TU ES SÛR QUE ÇA MARCHE
-        } else {
-            console.log("✅ Domaine autorisé.");
+            return; // Arrêt immédiat du script
         }
+        // ------------------------------------
 
         // 1. Ajouter le script Botpress
         const botpressScript = document.createElement('script');
@@ -40,18 +35,18 @@
         document.head.appendChild(style);
 
         // 3. Créer le conteneur du webchat
-        // On vérifie si le conteneur existe déjà pour éviter les doublons
         if (!document.getElementById('webchat') && document.body) {
             const webchatDiv = document.createElement('div');
             webchatDiv.id = 'webchat';
             webchatDiv.style.width = '500px';
             webchatDiv.style.height = '500px';
+            // Z-index très élevé pour être sûr qu'il passe devant tout le reste du site
+            webchatDiv.style.zIndex = '2147483647'; 
             document.body.appendChild(webchatDiv);
         }
 
         // 4. Initialiser Botpress
         botpressScript.onload = () => {
-            console.log("✅ Script Botpress chargé, initialisation...");
             window.botpress.on("webchat:ready", () => {
                 window.botpress.open();
             });
@@ -91,12 +86,10 @@
         };
     }
 
-    // --- CORRECTION DU TIMING ---
-    // Si la page est déjà chargée ("complete" ou "interactive"), on lance tout de suite.
+    // Lancement intelligent (Dès que possible)
     if (document.readyState === "complete" || document.readyState === "interactive") {
         initBotpress();
     } else {
-        // Sinon, on attend que la page soit prête
         document.addEventListener("DOMContentLoaded", initBotpress);
     }
 })();
